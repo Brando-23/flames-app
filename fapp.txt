@@ -1,0 +1,152 @@
+import 'package:flutter/material.dart';
+import 'dart:ui';
+import 'package:flutter/widgets.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String youname = "";
+  String sname = "";
+  List<String> flames = ["f", "l", "a", "m", "e", "s"];
+
+  Map<String, String> data = {
+    "f": "You are a best friend to him/her",
+    "l": "You are in love with her/him",
+    "a": "Affection with her/him",
+    "m": "Getting married",
+    "e": "You are enemies",
+    "s": "You are sister/brother"
+  };
+//------------------function to check----------------
+  void findrelationship() {
+    List<String> long = (youname.length > sname.length ? youname : sname)
+        .toLowerCase()
+        .split('');
+    List<String> short = (youname.length < sname.length ? youname : sname)
+        .toLowerCase()
+        .split('');
+
+    final local = [...long];
+    for (var i in local) {
+      if (short.contains(i)) {
+        long.remove(i);
+        short.remove(i);
+      }
+    }
+    final total = long.length + short.length;
+    var ans = relationship(flames, total);
+    print("final answer:" + ans);
+
+//-----------------alertbox----------------------
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Your relationship'),
+        content: Text(data[ans] ?? ""),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'Cancel'),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+        backgroundColor: Color.fromARGB(0, 8, 8, 251),
+      ),
+    );
+  }
+
+//------------------finding relationship------------------
+  String relationship(List<String> flames, int length) {
+    if (flames.length == 1) {
+      return flames.join('');
+    }
+    final find = length % flames.length;
+    final rem = [...flames];
+    rem.removeAt(find == 0 ? flames.length - 1 : find - 1);
+
+    return relationship(rem, length);
+  }
+
+//-------------------appbar--------------------------
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "FLAMES APP",
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontFamily: 'Rockwell Extra Bold'),
+        ),
+        backgroundColor: Color.fromARGB(255, 249, 111, 192),
+      ),
+
+      //----------------body contains----------------------
+      body: Column(
+        children: [
+          //--------------------first textfield-----------------
+          Padding(
+            padding: const EdgeInsets.all(22),
+            child: TextField(
+              onChanged: ((value) {
+                youname = value;
+              }),
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), labelText: "Your name"),
+            ),
+          ),
+
+          //--------------second textfield--------------------
+          Padding(
+            padding: const EdgeInsets.all(22.0),
+            child: TextField(
+              onChanged: ((value) {
+                sname = value;
+              }),
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), labelText: "Your Friend name"),
+            ),
+          ),
+
+          //------------------button to click-----------------
+          SizedBox(
+            width: 250,
+            child: ElevatedButton(
+              onPressed: () {
+                print(youname);
+                print(sname);
+                findrelationship();
+              },
+              child: Text(
+                "Check my relationship",
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
